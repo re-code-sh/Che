@@ -23,4 +23,7 @@ public class CameraXUtils {
         return true;
     }
 
+    public static void loadCameraXSizes() {
+    }
+
 }

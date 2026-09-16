@@ -393,7 +393,7 @@ public class ContactsController extends BaseController {
         Utilities.globalQueue.postRunnable(() -> {
             AccountManager am = AccountManager.get(ApplicationLoader.applicationContext);
             try {
-                Account[] accounts = am.getAccountsByType("uz.unnarsx.cherrygram");
+                Account[] accounts = am.getAccountsByType(ApplicationLoader.applicationContext.getPackageName());
                 for (int a = 0; a < accounts.length; a++) {
                     Account acc = accounts[a];
                     boolean found = false;
@@ -425,7 +425,7 @@ public class ContactsController extends BaseController {
                 readContacts();
                 if (systemAccount == null) {
                     try {
-                        systemAccount = new Account("" + getUserConfig().getClientUserId(), "uz.unnarsx.cherrygram");
+                        systemAccount = new Account("" + getUserConfig().getClientUserId(), ApplicationLoader.applicationContext.getPackageName());
                         am.addAccountExplicitly(systemAccount, "", null);
                     } catch (Exception ignore) {
 
@@ -439,7 +439,7 @@ public class ContactsController extends BaseController {
         try {
             systemAccount = null;
             AccountManager am = AccountManager.get(ApplicationLoader.applicationContext);
-            Account[] accounts = am.getAccountsByType("uz.unnarsx.cherrygram");
+            Account[] accounts = am.getAccountsByType(ApplicationLoader.applicationContext.getPackageName());
             for (int a = 0; a < accounts.length; a++) {
                 Account acc = accounts[a];
                 boolean found = false;
@@ -515,7 +515,7 @@ public class ContactsController extends BaseController {
                 AndroidUtilities.runOnUIThread(() -> {
                     AccountManager am = AccountManager.get(ApplicationLoader.applicationContext);
                     try {
-                        Account[] accounts = am.getAccountsByType("uz.unnarsx.cherrygram");
+                        Account[] accounts = am.getAccountsByType(ApplicationLoader.applicationContext.getPackageName());
                         systemAccount = null;
                         for (int a = 0; a < accounts.length; a++) {
                             Account acc = accounts[a];
@@ -533,7 +533,7 @@ public class ContactsController extends BaseController {
 
                     }
                     try {
-                        systemAccount = new Account("" + getUserConfig().getClientUserId(), "uz.unnarsx.cherrygram");
+                        systemAccount = new Account("" + getUserConfig().getClientUserId(), ApplicationLoader.applicationContext.getPackageName());
                         am.addAccountExplicitly(systemAccount, "", null);
                     } catch (Exception ignore) {
 

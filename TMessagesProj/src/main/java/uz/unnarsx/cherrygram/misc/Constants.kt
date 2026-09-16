@@ -54,7 +54,7 @@ object Constants {
     var CG_GITHUB_URL = "https://github.com/arsLan4k1390/Cherrygram"
     /** CG Links finish */
 
-    const val PACKAGE_NAME = "uz.unnarsx.cherrygram"
+    const val PACKAGE_NAME = "uz.unnarsx.cherrygram.app"
 
     /** CG Chats IDs start */
     const val Cherrygram_Owner = 282287840L // Cherrygram Owner (Arslan)

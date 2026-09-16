@@ -107,6 +107,27 @@ object CherrygramCoreConfig: CoroutineScope by CoroutineScope(
 
     /** Misc start */
     var cgBrandedScreenshots by sharedPreferences.boolean("DP_BrandedScreenshots", false)
+    var cgBrandedScreenshotsStartTime by sharedPreferences.long("DP_BrandedScreenshots_StartTime", 0L)
+    var cgForceUnlockSupporterTier by sharedPreferences.int("DP_ForceUnlockSupporterTier", 0) // 0=Off, 1=Tier 1 ($2), 2=Tier 2 ($5)
+
+    @JvmStatic
+    fun getBrandedScreenshotsActiveDays(): Long {
+        if (!cgBrandedScreenshots) return 0L
+        val startTime = cgBrandedScreenshotsStartTime
+        if (startTime <= 0L) return 0L
+        val elapsed = System.currentTimeMillis() - startTime
+        if (elapsed < 0L) return 0L
+        return elapsed / (24 * 60 * 60 * 1000L)
+    }
+
+    @JvmStatic
+    fun isBrandedScreenshotsActiveForDays(days: Int): Boolean {
+        if (cgForceUnlockSupporterTier >= 2) return true
+        if (cgForceUnlockSupporterTier == 1 && days <= 5) return true
+        if (!cgBrandedScreenshots) return false
+        return getBrandedScreenshotsActiveDays() >= days
+    }
+
     var sleepTimer by sharedPreferences.boolean("CG_Sleep_Timer", false)
     /** Misc finish */
 

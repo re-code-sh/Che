@@ -19,4 +19,7 @@ TMessagesProj/jni/ffmpeg/build_android
 Keytool.zip
 Cherrygram.jks
 mykey.jks
+*.jks
+*.base64
+.codegraph/
 actions-runner

@@ -25,6 +25,8 @@ dependencies {
     implementation 'androidx.core:core-ktx:1.18.0'
     coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.1.5'
     implementation files('../TMessagesProj/libs/libgsaverification-client.aar')
+
+//    implementation 'com.aheaditec.talsec.security:TalsecSecurity-Community:18.0.4'
 }
 
 android {
@@ -54,17 +56,17 @@ android {
 
     signingConfigs {
         debug {
-            storeFile file('../Your_Key.jks')
-            storePassword 'Your_Password'
-            keyAlias 'Your_Alias'
-            keyPassword 'Your_Password'
+            storeFile file(System.getenv("SIGN_KEY_FILE") ?: '../Your_Key.jks')
+            storePassword (System.getenv("SIGN_STORE_PASSWORD") ?: 'Your_Password')
+            keyAlias (System.getenv("SIGN_KEY_ALIAS") ?: 'Your_Alias')
+            keyPassword (System.getenv("SIGN_KEY_PASSWORD") ?: 'Your_Password')
         }
 
         release {
-            storeFile file('../Your_Key.jks')
-            storePassword 'Your_Password'
-            keyAlias 'Your_Alias'
-            keyPassword 'Your_Password'
+            storeFile file(System.getenv("SIGN_KEY_FILE") ?: '../Your_Key.jks')
+            storePassword (System.getenv("SIGN_STORE_PASSWORD") ?: 'Your_Password')
+            keyAlias (System.getenv("SIGN_KEY_ALIAS") ?: 'Your_Alias')
+            keyPassword (System.getenv("SIGN_KEY_PASSWORD") ?: 'Your_Password')
         }
     }
 
@@ -237,10 +239,16 @@ android {
 
 static def loadEnv(filePath) {
     def env = [:]
-    Files.lines(Paths.get(filePath)).each { line ->
+    def file = new File(filePath)
+    if (!file.exists()) {
+        return env
+    }
+    file.eachLine { line ->
         if (line && !line.startsWith("#")) {
-            def (key, value) = line.split('=', 2)
-            env[key.trim()] = value?.trim()
+            def parts = line.split('=', 2)
+            if (parts.length == 2) {
+                env[parts[0].trim()] = parts[1]?.trim()
+            }
         }
     }
     return env
@@ -267,11 +275,12 @@ static def isWindowsOrMacOS() {
     return osName.contains('win') || osName.contains('mac')
 }
 
+def systemUser = (project.hasProperty('SYSTEM_USERNAME') ? SYSTEM_USERNAME : (System.getenv('SYSTEM_USERNAME') ?: 'runner'))
 def desktopPath
 if (isWindows()) {
-    desktopPath = "C:/Users/${SYSTEM_USERNAME}/Desktop/Cherry/Stable"
+    desktopPath = "C:/Users/${systemUser}/Desktop/Cherry/Stable"
 } else if (isMacOS()) {
-    desktopPath = "/Users/${SYSTEM_USERNAME}/Desktop/Cherry/Stable"
+    desktopPath = "/Users/${systemUser}/Desktop/Cherry/Stable"
 }
 
 tasks.register('copyFiles', Copy) {

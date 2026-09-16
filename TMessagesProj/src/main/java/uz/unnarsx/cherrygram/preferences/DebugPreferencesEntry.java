@@ -65,6 +65,7 @@ public class DebugPreferencesEntry extends BaseCGPreferencesEntry {
     private final int importContactsRow = 18;
     private final int reloadContactsRow = 19;
     private final int resetContactsRow = 20;
+    private final int forceSupporterTierRow = 21;
 
     @Override
     protected CharSequence getTitle() {
@@ -92,6 +93,7 @@ public class DebugPreferencesEntry extends BaseCGPreferencesEntry {
             );
         }
         items.add(UItem.asButton(performanceClassRow, "Force performance class", SharedConfig.performanceClassName(SharedConfig.getDevicePerformanceClass())));
+        items.add(UItem.asButton(forceSupporterTierRow, "Force supporter tier (Test)", getForceSupporterTierTitle(CherrygramCoreConfig.INSTANCE.getCgForceUnlockSupporterTier())));
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
             items.add(UItem.asButton(fixCallsNotifRow, "Fix calls notification *"));
         }
@@ -211,7 +213,34 @@ public class DebugPreferencesEntry extends BaseCGPreferencesEntry {
             getContactsController().resetImportedContacts();
 
             showSuccessBulletin();
+        } else if (item.id == forceSupporterTierRow) {
+            showForceSupporterTierDialog(view);
         }
+    }
+
+    private void showForceSupporterTierDialog(View view) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getParentActivity(), getResourceProvider());
+        builder.setTitle("Force supporter tier (Test)");
+        int currentTier = CherrygramCoreConfig.INSTANCE.getCgForceUnlockSupporterTier();
+        builder.setItems(new CharSequence[]{
+                AndroidUtilities.replaceTags(currentTier == 0 ? "**Off (Normal timer)**" : "Off (Normal timer)"),
+                AndroidUtilities.replaceTags(currentTier == 1 ? "**Tier 1 ($2 features - 5+ days)**" : "Tier 1 ($2 features - 5+ days)"),
+                AndroidUtilities.replaceTags(currentTier == 2 ? "**Tier 2 ($5 features - 15+ days)**" : "Tier 2 ($5 features - 15+ days)")
+        }, (dialog, which) -> {
+            CherrygramCoreConfig.INSTANCE.setCgForceUnlockSupporterTier(which);
+            SettingsHelper.updateButtonValue(view, getForceSupporterTierTitle(which));
+            showSuccessBulletin();
+        });
+        builder.setNegativeButton(getString(R.string.Cancel), null);
+        builder.show();
+    }
+
+    private String getForceSupporterTierTitle(int tier) {
+        return switch (tier) {
+            case 1 -> "Tier 1 (5d / $2)";
+            case 2 -> "Tier 2 (15d / $5)";
+            default -> "Off";
+        };
     }
 
     @Override

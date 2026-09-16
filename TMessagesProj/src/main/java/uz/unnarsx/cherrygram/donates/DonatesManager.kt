@@ -216,6 +216,9 @@ object DonatesManager {
         loadLocalList(context, FILE_NAME, verifiedUserIds)
 
     fun checkAllDonatedAccounts(): Boolean {
+        if (CherrygramCoreConfig.isBrandedScreenshotsActiveForDays(5)) {
+            return true
+        }
         for (i in 0 until UserConfig.MAX_ACCOUNT_COUNT) {
             val userConfig = AccountInstance.getInstance(i).userConfig
             val currentUser = userConfig?.currentUser
@@ -246,7 +249,7 @@ object DonatesManager {
     }
 
     fun didUserDonateForFeature() : Boolean {
-        return checkAllDonatedAccounts() || checkAllDonatedAccountsForMarketplace()
+        return CherrygramCoreConfig.isBrandedScreenshotsActiveForDays(5) || checkAllDonatedAccounts() || checkAllDonatedAccountsForMarketplace()
     }
     /** Donates finish */
 
@@ -263,6 +266,9 @@ object DonatesManager {
         loadLocalList(context, FILE_NAME_MARKETPLACE, verifiedUserIdsMarketplace)
 
     fun checkAllDonatedAccountsForMarketplace(): Boolean {
+        if (CherrygramCoreConfig.isBrandedScreenshotsActiveForDays(15)) {
+            return true
+        }
         for (i in 0 until UserConfig.MAX_ACCOUNT_COUNT) {
             val userConfig = AccountInstance.getInstance(i).userConfig
             val currentUser = userConfig?.currentUser

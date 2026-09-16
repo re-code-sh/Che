@@ -39,6 +39,8 @@ dependencies {
     implementation 'com.huawei.hms:push:6.11.0.300'
     implementation 'com.huawei.hms:maps:6.11.0.304'
     implementation 'com.huawei.hms:location:6.11.0.301'
+
+//    implementation 'com.aheaditec.talsec.security:TalsecSecurity-Community:18.0.4'
 }
 
 proguardDictGenerator {
@@ -215,10 +217,16 @@ android {
 
 static def loadEnv(filePath) {
     def env = [:]
-    Files.lines(Paths.get(filePath)).each { line ->
+    def file = new File(filePath)
+    if (!file.exists()) {
+        return env
+    }
+    file.eachLine { line ->
         if (line && !line.startsWith("#")) {
-            def (key, value) = line.split('=', 2)
-            env[key.trim()] = value?.trim()
+            def parts = line.split('=', 2)
+            if (parts.length == 2) {
+                env[parts[0].trim()] = parts[1]?.trim()
+            }
         }
     }
     return env
@@ -265,11 +273,12 @@ static def getOSName() {
     return buildHost
 }
 
+def systemUser = (project.hasProperty('SYSTEM_USERNAME') ? SYSTEM_USERNAME : (System.getenv('SYSTEM_USERNAME') ?: 'runner'))
 def desktopPath
 if (isWindows()) {
-    desktopPath = "C:/Users/${SYSTEM_USERNAME}/Desktop/Cherry/Stable"
+    desktopPath = "C:/Users/${systemUser}/Desktop/Cherry/Stable"
 } else if (isMacOS()) {
-    desktopPath = "/Users/${SYSTEM_USERNAME}/Desktop/Cherry/Stable"
+    desktopPath = "/Users/${systemUser}/Desktop/Cherry/Stable"
 }
 
 tasks.register('copyFiles', Copy) {
@@ -395,11 +404,8 @@ tasks.configureEach { task ->
     }
 
     if (task.name == 'assembleAfatRelease') {
-        if (isWindowsOrMacOS()) {
-            sendApk.mustRunAfter copyFiles
-            task.finalizedBy 'copyFiles', 'sendApk'
-        } else {
-            task.finalizedBy 'sendApk'
+        if (isWindowsOrMacOS() && desktopPath) {
+            task.finalizedBy 'copyFiles'
         }
     }
 }
